@@ -1,0 +1,2 @@
+on crée un model Post
+php artisan make:model Post -m

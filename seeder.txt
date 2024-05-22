@@ -1,0 +1,57 @@
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=terrain
+DB_USERNAME=postgres
+DB_PASSWORD=passer
+
+https://walkerspider.com/cours/laravel/seeders-factories/
+
+------seeder 
+php artisan make:seeder TerrainsSeeder
+
+public function run(): void
+    {
+        Terrain::factory(10)->create();
+    }
+
+
+php artisan make:factory TerrainFactory
+return [
+            'longueur' => $this->faker->numberBetween(1, 100),
+            'largeur' => $this->faker->numberBetween(1, 100),
+            'papier' => $this->faker->randomElement(['Bail', 'Titre foncier']),
+        ];
+
+
+databaseseeder
+\App\Models\Terrain::factory(20)->create();
+
+php artisan migrate:fresh --seed
+
+
+________pagination
+  public function liste()
+    {
+        $terrain = Terrain::orderBy('longueur')->paginate(5);
+      return view("admin.terrains.liste-terrain", compact('terrain'));
+    }
+
+__
+
+
+ </table>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <ul class="pagination">
+                                @for ($i = 1; $i <= $terrain->lastPage(); $i++)
+                                    <li class="{{ ($terrain->currentPage() == $i) ? 'active' : '' }}">
+                                        <a href="{{ $terrain->url($i) }}">{{ $i }}</a>
+                                    </li>
+                                @endfor
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- End Pagination -->
