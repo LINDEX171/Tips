@@ -1,2 +1,111 @@
 on crée un model Post
 php artisan make:model Post -m
+dans les migrations on ajoute 
+$table->id();
+$table->String('title');
+$table->longText('description')->nullable();
+$table->timestamps();
+
+php artisan migrate
+
+on cree un dossier api au niveau du coltroller en mettant
+php artisan make:controller Api\PostController
+
+
+______pour recher l'url dans l'api on mets (http://127.0.0.1:8000/api/posts/create)
+
+//recuperer la liste des posts
+au niveau de route/api/ on mets
+Route::get('posts',[PostController::class, 'index']);
+
+//ajouter un post |post|put|patch
+Route::post('posts/create',[PostController::class, 'store']);
+
+et puis au niveau du controller
+class PostController extends Controller
+{
+    public function index(){
+        return 'liste des posts';
+    }
+
+    public function store(){
+        $post = new Post();
+        $post -> titre = 'titre exemple';
+        $post -> description = 'description';
+
+        $post -> save();
+    } 
+}
+
+
+apres on ouvre postman
+dans postman on cree un new collection (nom dossier Post_test)
+on cree un request nommer creer un post on le mets de type (post) et on 
+passe l'url http://127.0.0.1:8000/api/posts/create (automatiquement ca s'enregistre 
+au niveau de la bdd)
+
+-----pour que les donnees proviennet de nos données du clients (react ect...)--
+on cree d'abord un request n tapant la commande php artisan make:request CreatePostRequest
+et puis on le verra dans app/http/requests
+au niveau de notre controller on mets
+public function store(CreatePostRequest $request){
+
+et puis au niveau app/http/requests/CreatePostRequest on mets autorize() a true
+et on reviens sur postman on mets http://127.0.0.1:8000/api/posts/create et les
+donnees sont envoyer(mais pas encore dynamique)
+____faisons d'abord les controlles de saisi ___
+y'a que le titre qui dit etre forcement fournis
+dans app/http/requests/CreatePostRequest mettre
+public function rules(): array
+    {
+        return [
+            'titre'=>'required'
+        ];
+    }
+et on remarquera que si on valide au niveau e postman les données ne seront pas enregistrer
+au niveau de la bdd
+
+on cree une fonction pour les messages d'erreurs 
+public function failedValidation(Validator $validator){
+//throw : Utilisé pour lancer une exception en PHP.
+        throw new HttpResponseException(response()->json([
+            'success'=>false,
+            'error'=>true,
+            'message'=>'Erreur de valdation',
+            'errorsList'=>$validator->errors(),
+        ]));
+    }
+
+si on veut personnaliser les messages on ajute
+ public function messages()
+    {
+        return [
+            'titre.required'=> 'un titre doit etre fourni'
+        ];
+    }
+
+si on repart dans postman on valide on verra le message d'erreur 
+
+____recuperer les données qui seront passés par l'utilisateur __
+dans notre fonction store au niveau du controller mettre
+
+public function store(CreatePostRequest $request){
+        
+        $post = new Post();
+        $post -> titre = $request -> titre;
+        $post -> description = $request -> description;
+
+        $post -> save();
+    } 
+
+et puis dans postman aller dans body row json et apres passer
+{
+    "titre" : "titre provenant de l'application client",
+    "description" : "description fe"
+}
+apres on clique sur send 
+au niveau de la bdd on verra les infos passer au niveau de notre postman
+
+
+
+
