@@ -1,0 +1,30 @@
+on veut faire la relation entre la table article et categorie 
+
+dans la migration des articles mettre 
+$table->unsignedBigInteger('categorie_id'); 
+$table->foreign('categorie_id')->references('id')->on('categories')->onDelete('cascade'); 
+
+puis dans le model Article mettre
+public function categorie()
+    {
+        return $this->belongsTo(Categorie::class);
+    }
+
+ArticleController
+
+$article->categorie_id = $request->categorie_id;
+
+dans notre view liste-article
+<div class="form-group">
+                        <label class="col-lg-2 control-label" for="categorie_id">Categorie :</label>
+                        <div class="col-lg-10">
+                            <select name="categorie_id" class="form-control">
+                                <option value="" selected disabled>Sélectionnez categorie</option>
+                                @foreach ($categories as $categorie)
+                                    <option value="{{ $categorie->id }}">{{ $categorie->nom }} </option>
+                                @endforeach
+                            </select>
+                        </div>
+</div>
+
+LISTE-ARTICLE (<td>{{ $a->categorie->nom }}</td>)
