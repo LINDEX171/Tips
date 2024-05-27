@@ -191,6 +191,75 @@ public function update(CreatePostRequest $request, $id){
 on parts dans postman on tape l'url http://127.0.0.1:8000/api/posts/edit/1
 (on le mets de type PUT)
 
+________________update d'une autre maniere(sans l'id)_________________
+
+au niveau de api.php mettre 
+Route::put('posts/edit/{post}',[PostController::class, 'update']);
+on modifie le update au niveau du controller de la sorte
+
+public function update(CreatePostRequest $request, Post $post){
+        
+         $post -> titre = $request -> titre;
+         $post -> description = $request -> description;
+         $post -> save();
+    }
+
+et apres si on part dans postman http://127.0.0.1:8000/api/posts/edit/1
+et ca va s'enregistrer directement
+et on le mets apres dans un try catch
+
+_____________________delete____________________
+on peut faire comme ce qu'on avait fait pour l'id au niveau de update mais on fait la 2E METHODE
+
+au niveau de api.php
+Route::delete('posts/{post}',[PostController::class, 'delete']);
+
+au niveau du controller
+
+public function update(CreatePostRequest $request, Post $post){
+        
+         try {
+            $post -> titre = $request -> titre;
+         $post -> description = $request -> description;
+         $post -> save();
+
+         return response()->json([
+            'status_code'=>200,
+            'statu_message'=>'le post a été modifié',
+            'data'=>$post
+            ]);
+
+         } 
+         
+         
+         catch (Exception $e) {
+            return response()->json($e);
+        }
+    }
+
+http://127.0.0.1:8000/api/posts/1 et on verra que c'est supprimer 
+
+_________________recuperer les donnees___________
+http://127.0.0.1:8000/api/posts (de type get)
+on avait deja mis la route Route::get('posts',[PostController::class, 'index']);
+
+au niveau de la fonction index
+
+ public function index(){
+        try {
+
+         return response()->json([
+            'status_code'=>200,
+            'statu_message'=>'les posts ont été recuperer',
+            'data'=> Post::all()
+            ]);
+         } 
+         
+         catch (Exception $e) {
+            return response()->json($e);
+        }
+    }
+
 
 
 

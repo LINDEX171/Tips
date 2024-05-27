@@ -1,0 +1,62 @@
+________________________________U P D A T E_____________________________________
+dans api.php ajouter la route
+Route::put('posts/edit/{id}',[PostController::class, 'update']);
+creer une fonction update au niveau du PostContoller
+et apres on cree un request php artisan make:request EditPostRequest (on active le true authorize)
+DANS le EditPostRequest on modifie la fonction rule de la sorte
+ public function rules(): array
+    {
+        return [
+            'titre' => 'required'
+        ];
+    }
+
+    public function failedValidation(Validator $validator){
+        //throw : Utilisé pour lancer une exception en PHP.
+        throw new HttpResponseException(response()->json([
+            'success'=>false,
+            'error'=>true,
+            'message'=>'Erreur de valdation',
+            'errorsList'=>$validator->errors(),
+        ]));
+    }
+
+    public function messages()
+    {
+        return [
+            'titre.required'=> 'un titre doit etre fourni'
+        ];
+    }
+
+au niveau de la fonction update de notre controller on mets
+public function update(CreatePostRequest $request, $id){
+         $post = Post::find($id);
+         $post -> titre = $request -> titre;
+         $post -> description = $request -> description;
+         $post -> save();
+    }
+
+on parts dans postman on tape l'url http://127.0.0.1:8000/api/posts/edit/1
+(on le mets de type PUT)
+
+________________update d'une autre maniere(sans l'id)_________________
+
+au niveau de api.php mettre 
+Route::put('posts/edit/{post}',[PostController::class, 'update']);
+on modifie le update au niveau du controller de la sorte
+
+public function update(CreatePostRequest $request, Post $post){
+        
+         $post -> titre = $request -> titre;
+         $post -> description = $request -> description;
+         $post -> save();
+    }
+
+et apres si on part dans postman http://127.0.0.1:8000/api/posts/edit/1
+et ca va s'enregistrer directement
+et on le mets apres dans un try catch
+
+
+
+
+

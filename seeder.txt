@@ -21,6 +21,10 @@ return [
             'longueur' => $this->faker->numberBetween(1, 100),
             'largeur' => $this->faker->numberBetween(1, 100),
             'papier' => $this->faker->randomElement(['Bail', 'Titre foncier']),
+           
+
+          //si la table a une relation
+           'categorie_id' => Categorie::factory(),
         ];
 
 

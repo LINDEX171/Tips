@@ -1,0 +1,30 @@
+_____________________delete____________________
+on peut faire comme ce qu'on avait fait pour l'id au niveau de update mais on fait la 2E METHODE
+
+au niveau de api.php
+Route::delete('posts/{post}',[PostController::class, 'delete']);
+
+au niveau du controller
+
+public function update(CreatePostRequest $request, Post $post){
+        
+         try {
+            $post -> titre = $request -> titre;
+         $post -> description = $request -> description;
+         $post -> save();
+
+         return response()->json([
+            'status_code'=>200,
+            'statu_message'=>'le post a été modifié',
+            'data'=>$post
+            ]);
+
+         } 
+         
+         
+         catch (Exception $e) {
+            return response()->json($e);
+        }
+    }
+
+http://127.0.0.1:8000/api/posts/1 et on verra que c'est supprimer 

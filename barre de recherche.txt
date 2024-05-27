@@ -1,0 +1,21 @@
+public function liste(Request $request)
+  {
+      $search = $request->input('search');
+
+      $categorie = Categorie::query()
+          ->when($search, function ($query, $search) {
+              return $query->where('nom', 'like', "%{$search}%");
+          })
+          ->paginate(5);
+
+      return view("admin.categories.liste-categorie", compact('categorie'));
+  }
+
+
+au niveau du view
+
+<!-- Formulaire de Recherche -->
+                    <form method="GET" action="{{ route('liste') }}" class="form-inline my-2 my-lg-0">
+                        <input name="search" class="form-control mr-sm-2" type="search" placeholder="Rechercher une categorie par nom" aria-label="Search" value="{{ request('search') }}">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Rechercher</button>
+                    </form> 

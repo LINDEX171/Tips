@@ -1,0 +1,25 @@
+_________________recuperer les donnees___________
+http://127.0.0.1:8000/api/posts (de type get)
+on avait deja mis la route Route::get('posts',[PostController::class, 'index']);
+
+au niveau de la fonction index
+
+ public function index(){
+        try {
+
+         return response()->json([
+            'status_code'=>200,
+            'statu_message'=>'les posts ont été recuperer',
+            'data'=> Post::all()
+            ]);
+         } 
+         
+         catch (Exception $e) {
+            return response()->json($e);
+        }
+    }
+
+
+
+
+

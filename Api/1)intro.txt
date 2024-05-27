@@ -1,0 +1,45 @@
+on crée un model Post
+php artisan make:model Post -m
+dans les migrations on ajoute 
+$table->id();
+$table->String('title');
+$table->longText('description')->nullable();
+$table->timestamps();
+
+php artisan migrate
+
+on cree un dossier api au niveau du coltroller en mettant
+php artisan make:controller Api\PostController
+
+
+______pour recher l'url dans l'api on mets (http://127.0.0.1:8000/api/posts/create)
+
+//recuperer la liste des posts
+au niveau de route/api/ on mets
+Route::get('posts',[PostController::class, 'index']);
+
+//ajouter un post |post|put|patch
+Route::post('posts/create',[PostController::class, 'store']);
+
+et puis au niveau du controller
+class PostController extends Controller
+{
+    public function index(){
+        return 'liste des posts';
+    }
+
+    public function store(){
+        $post = new Post();
+        $post -> titre = 'titre exemple';
+        $post -> description = 'description';
+
+        $post -> save();
+    } 
+}
+
+
+apres on ouvre postman
+dans postman on cree un new collection (nom dossier Post_test)
+on cree un request nommer creer un post on le mets de type (post) et on 
+passe l'url http://127.0.0.1:8000/api/posts/create (automatiquement ca s'enregistre 
+au niveau de la bdd)
