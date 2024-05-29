@@ -1,0 +1,82 @@
+___________login user___________
+on crée une route dans api.php
+Route::post('/login', [Usercontroller::class, 'login']);
+
+on cree un request
+ php artisan make:request logUserRequest
+
+et apres au niveau du UserController cree une function login
+
+au niveau du logUserRequest mettre le autorize a true et
+au nivau de la foncton rule mettre
+
+ public function rules(): array
+    {
+        return [
+            'email'=>'required|email|exists:users,email',
+            'password'=>'required',
+        ];
+    }
+
+(required: pour nous rassurer que la mdp a été forni
+ email:format email
+ exists:users,email': l'emal qui est enregistrer par l'utilisateur
+est email qui existe au niveau de la bdd)
+
+ajouter ca aussi pour les verifications
+public function failedValidation(Validator $validator){
+        //throw : Utilisé pour lancer une exception en PHP.
+        throw new HttpResponseException(response()->json([
+            'success'=>false,
+            'error'=>true,
+            'message'=>'Erreur de valdation',
+            'errorsList'=>$validator->errors(),
+        ]));
+    }
+
+    public function messages()
+    {
+        return [
+            'password.required'=> 'email non fourni',
+            'email.email'=> 'email non valide',
+            'email.exists'=> 'email n\'exite pas',
+            'password.required'=> 'mot de asse non fourni'
+        ];
+    }
+
+
+dans UserController mettre ca
+ public function login(logUserRequest $request){
+
+    }
+
+apres on fait les tests 
+au niveau de postman http://127.0.0.1:8000/api/
+{
+    "name" : "ibrahima",
+    "email" : "email2@gmail.com",
+    "password" : 124
+}
+
+&&&&&&& connexion de lutilisateur
+dans UserController
+public function login(logUserRequest $request){
+
+      if (auth()->attempt($request->only(['email','password']))) {
+        # code...
+      }
+       else {
+        //si les nformations ne correspondent a aucun utilisateur
+        return response()->json([
+            'status_code'=>403,
+            'statu_message'=>'informatin non valide',
+            ]);
+      }
+      
+    }
+
+on test dans^postman si on fourni un mdp ou email 
+non valide il nous le dire
+
+	
+

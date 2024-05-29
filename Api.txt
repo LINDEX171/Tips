@@ -277,7 +277,7 @@ public function rules(): array
     {
         return [
             'name' => 'required',
-            'name' => 'required|unique:users,email',
+            'email' => 'required|unique:users,email',
             'password' => 'required',
         ];
     }
@@ -316,10 +316,125 @@ public function register(RegisterUser $request){
         $user -> save();
 
     }
+
+au niveau de postman mettre
+{
+    "name" : "ibrahima",
+    "email" : "email@gmail.com",
+     "password" : 124
+}
 et ca s'enregistrera au nivea de la bdd
 
 ______________hasher mot de passe ______________
+au niveau de controller modifier le mot de passe de la sorte
+$user -> password = Hash::make($request -> password, ['rounds'=>12]) ;
+on fait ca au niveau de postman
+{
+    "name" : "ibrahima",
+    "email" : "email1@gmail.com",
+     "password" : 124
+}
+on verra que le mdp est hasher
+
+_____retourner les données____
+on le mets dans un try catch en meme temps on retourne un message de succes
+try {
+            
+            $user = new User();
+            $user -> name = $request -> name;
+            $user -> email = $request -> email;
+            $user -> password = Hash::make($request -> password, ['rounds'=>12]) ;
+            $user -> save();
+
+            return response()->json([
+                'status_code'=>200,
+                'statu_message'=>'utilisateur enregistrer',
+                'data'=>$user
+                ]);
+
+        } catch (Exception $e) {
+            return response()->json($e);
+        }
+
+___________login user___________
+on crée une route dans api.php
+Route::post('/login', [Usercontroller::class, 'login']);
+
+on cree un request
+ php artisan make:request logUserRequest
+
+et apres au niveau du UserController cree une function login
+
+au niveau du logUserRequest mettre le autorize a true et
+au nivau de la foncton rule mettre
+
+ public function rules(): array
+    {
+        return [
+            'email'=>'required|email|exists:users,email',
+            'password'=>'required',
+        ];
+    }
+
+(required: pour nous rassurer que la mdp a été forni
+ email:format email
+ exists:users,email': l'emal qui est enregistrer par l'utilisateur
+est email qui existe au niveau de la bdd)
+
+ajouter ca aussi pour les verifications
+public function failedValidation(Validator $validator){
+        //throw : Utilisé pour lancer une exception en PHP.
+        throw new HttpResponseException(response()->json([
+            'success'=>false,
+            'error'=>true,
+            'message'=>'Erreur de valdation',
+            'errorsList'=>$validator->errors(),
+        ]));
+    }
+
+    public function messages()
+    {
+        return [
+            'password.required'=> 'email non fourni',
+            'email.email'=> 'email non valide',
+            'email.exists'=> 'email n\'exite pas',
+            'password.required'=> 'mot de asse non fourni'
+        ];
+    }
 
 
+dans UserController mettre ca
+ public function login(logUserRequest $request){
 
+    }
+
+apres on fait les tests 
+au niveau de postman http://127.0.0.1:8000/api/
+{
+    "name" : "ibrahima",
+    "email" : "email2@gmail.com",
+    "password" : 124
+}
+
+&&&&&&& connexion de lutilisateur
+dans UserController
+public function login(logUserRequest $request){
+
+      if (auth()->attempt($request->only(['email','password']))) {
+        # code...
+      }
+       else {
+        //si les nformations ne correspondent a aucun utilisateur
+        return response()->json([
+            'status_code'=>403,
+            'statu_message'=>'informatin non valide',
+            ]);
+      }
+      
+    }
+
+on test dans^postman si on fourni un mdp ou email 
+non valide il nous le dire
+
+	
 
