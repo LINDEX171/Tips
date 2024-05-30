@@ -1,0 +1,22 @@
+_______relation lie un post a un utilisateur_____
+on cree une migration
+php artisan make:migration add_user_id_to_posts_table
+
+au niveau de cette table metre
+public function up(): void
+    {
+        Schema::table('posts', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+        });
+    }
+
+public function down(): void
+    {
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropColumn('user_id');
+        });
+    }
+
+php artisan migrate et on verra que la colonne user_id est ajouter dans la table post
+
