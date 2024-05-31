@@ -1,0 +1,24 @@
+_______l'utilisateur ne puisse creer des posts que lorsqu'il est connecter_____
+dans api.php on voit la route
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+a travers cette route laravel reupere les informations des utilisateurs 
+
+dans postman mettre http://127.0.0.1:8000/api/user(get)
+sans aucun json cliquer sur send
+on aura ca Route [login] not defined
+c'est parceque la route est protege par un middleware et pour le regler
+il nous faut  un token 
+on pars dans postman headers
+key:Authorization Value:Bearer 2|gO6t8KtGru27WROokPPoseqgpZJXo35rC10VHA3fc189f460
+le token est eu sur la route http://127.0.0.1:8000/api/login (post)
+{
+    "name" : "ibrahima",
+    "email" : "email2@gmail.com",
+    "password" : 124
+}
+et si on revient on mets http://127.0.0.1:8000/api/user(get)
+on verra les informations
