@@ -1,0 +1,7 @@
+1)definir la chaine de connexion
+2)definir la classe context
+3)activer le code first et parametrer fichier configuration
+4)mettre a jour la BD
+
+donnée de reerence (donnee qu'on ne cree pas; lister pays ect...) 
+Methode seed permet de charger des dnnées de réferences
