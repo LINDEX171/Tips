@@ -1,1 +1,1 @@
-for some notice 
+for some notice ABOUT LARAVEL AND OTHER LANGAGE
