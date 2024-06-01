@@ -1,0 +1,637 @@
+Port 15 et 21 pour oracle 
+windows + R / services.msc (Pour voir les services de windows)
+Oracle Service XE
+Oracle DB21 Home...
+
+winds + R / cmd
+
+C:\Users\mohom>sqlplus /nolog
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Sam. Nov. 18 15:06:22 2023
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> conn sys as sysdba
+Entrez le mot de passe :
+ConnectÚ.
+SQL> show user
+USER est "SYS"
+SQL> spool spool C:\Users\mohom\Documents\Leçons\oracle\Oracle_Labs\01_prise_en_main.sql
+
+//architecture multitenances//
+
+____________________________________________________________________________________________________________________________________________________________
+
+SQL> spool C:\Users\mohom\Documents\Leçons\oracle\Oracle_Labs\01_prise_en_main.sql (tout ce qu'on fera sera écrit dans le fichier sql)
+SQL> --Generalites
+La différence entre Une BDD, SGBD et Serveur de BDD.
+
+SQL> spool C:\Oracle_Labs\01_prise_en_main.sql
+SQL> -- Generalites
+SQL> /*
+SQL> Oracle est un SGBD dont l'installation vient avec des programmes client. Pour notre cas, ces programmes client sont dans le répertoire :
+SQL> (mettre le path d'oracle)
+SQL> Les programmes client permettent de soumettre des requêtes au serveur de BDD.
+SQL> L'administrateur de Oracle Database est SYS.
+SQL> */
+SQL> -- Se connecter en tant que administrateur
+SQL> conn sys as sysdba
+Entrez le mot de passe :
+ConnectÚ.
+SQL> -- Voir l'utilisateur en cours
+SQL> show user
+USER est "SYS"
+SQL> -- Architecture Multitenant
+SQL> ---------------------------
+SQL> /*
+SQL> Depuis la version 12c, oracle a adopté l'architecture multitenant.
+SQL> Il s'agit d'une architecture ou une BDD appellées root container database (CDB) héberge d'autres BDD appellées pluggable database (PDB)
+SQL> */
+SQL> -- Voir le container en cours
+SQL> show con_name
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> -- Voir les pluggables du container en cours
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                       READ ONLY  NO
+         3 XEPDB1                         READ WRITE NO
+SQL> -- Changer de container
+SQL> alter session
+  2  set container = XEPDB1
+  3  ;
+
+Session modifiÚe.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+XEPDB1
+SQL> alter session
+  2  set container = CDB$ROOT;
+
+Session modifiÚe.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> spool off
+
+_______________________________________________________________________________________________________________________________
+Microsoft Windows [version 10.0.19045.3693]
+(c) Microsoft Corporation. Tous droits réservés.
+
+C:\Users\mohom>sqlplus /nolog
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Sam. DÚc. 9 15:26:31 2023
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> conn sys as sysdba
+Entrez le mot de passe :
+ConnectÚ.
+SQL> conn sys/passer@localhost:1521/XEPDB1
+ERROR:
+ORA-12541: TNS : pas de processus d'Úcoute
+
+
+Avertissement : vous n'Ûtes plus connectÚ Ó ORACLE.
+SQL>
+
+1- Vérifier si le service listerner a démarré 
+Pour régler cette erreur on doit vérifier si le service listener est démarré, regarder ça dans les services : win + R services.msc
+
+2- Démarré le service sous cmd en admin:
+lsnrctl status
+lsnrctl start
+netca //rechercher au niveau de windows et éxécuter en tant qu'administrateur et créer un nouveau listener mais si la commande précédente marche ce n'est pas la peine 
+
+
+(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.56.1)(PORT=1521))
+
+3- Désinstaller oracle :
+a) Arrêter tous les services de Oracle DB
+win + R
+services.msc
+
+b) Entrer dans le registre
+win + R
+regedit
+
+
+
+TP Oracle:
+1- Créer l'utilisateur lpgl avec le mdp passer (dans le pluggable)
+2- Attribuer à lpgl les priviléges nécessaires pour travailler
+3- Se connecter en tant que lpgl et implémenter le schéma dont le script est partagé dans le groupe telegram 
+
+Solution : 
+Microsoft Windows [version 10.0.19045.3693]
+(c) Microsoft Corporation. Tous droits réservés.
+
+C:\Users\mohom>sqlplus /nolog
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Sam. DÚc. 9 17:09:47 2023
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> conn sys as sysdba
+Entrez le mot de passe :
+ConnectÚ.
+SQL> alter session
+  2  set container = XEPDB1
+  3  ;
+
+Session modifiÚe.
+
+SQL> create user lpgl identified by passer
+  2  ;
+
+Utilisateur crÚÚ.
+
+SQL> grant connect, resource to lpgl;
+
+Autorisation de privilÞges (GRANT) acceptÚe.
+
+SQL> alter user lpgl quota 300M on users;
+
+Utilisateur modifiÚ.
+
+SQL> conn lpgl/passer@192.168.56.1:1521/XEPDB1
+ConnectÚ.
+SQL>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Microsoft Windows [version 10.0.19045.3693]
+(c) Microsoft Corporation. Tous droits réservés.
+
+C:\Users\mohom>sqlplus /nolog
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Sam. DÚc. 9 17:09:47 2023
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+SQL> conn sys as sysdba
+Entrez le mot de passe :
+ConnectÚ.
+SQL> alter session
+  2  set container = XEPDB1
+  3  ;
+
+Session modifiÚe.
+
+SQL> create user lpgl identified by passer
+  2  ;
+
+Utilisateur crÚÚ.
+
+SQL> grant connect, resource to lpgl;
+
+Autorisation de privilÞges (GRANT) acceptÚe.
+
+SQL> alter user lpgl quota 300M on users;
+
+Utilisateur modifiÚ.
+
+SQL> conn lpgl/passer@192.168.56.1:1521/XEPDB1
+ConnectÚ.
+SQL> show user
+USER est "LPGL"
+SQL> CREATE TABLE DEPARTMENTS
+  2  (DEPARTEMENT_ID NUMBER(6),
+  3  EXIT
+  4    5
+SQL> show tables;
+SP2-0158: option SHOW inconnue "tables"
+SQL> show table;
+SP2-0158: option SHOW inconnue "table"
+SQL> cls
+SP2-0042: commande inconnue "cls" - reste de la ligne ignorÚ.
+SQL> CREATE TABLE DEPARTMENTS
+  2  (DEPARTMENT_ID NUMBER(6),
+  3  DEPARTMENT_NAME VARCHAR2(30) NOT NULL ,
+  4  MANAGER_ID NUMBER(6),
+  5  LOCATION_ID NUMBER(4),
+  6  CONSTRAINT PK_DEPARTEMENTS PRIMARY KEY(DEPARTMENT_ID)) ;
+
+Table crÚÚe.
+
+SQL> INSERT INTO DEPARTEMENTS VALUES(10, 'Administration' ,200, 1700);
+INSERT INTO DEPARTEMENTS VALUES(10, 'Administration' ,200, 1700)
+            *
+ERREUR Ó la ligne 1 :
+ORA-00942: Table ou vue inexistante
+
+
+SQL> use table DEPARTMENTS;
+SP2-0734: commande inconnue au dÚbut de "use table ..." - le reste de la ligne est ignorÚ.
+SQL> INSERT INTO DEPARTMENTS VALUES(10, 'Administration', 200, 1700);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(20, 'Marketing', 201, 1800);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(50, 'Shipping', 124, 1500);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(60, 'IT', 103, 1400);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(80, 'Sales', 149, 2500);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(90, 'Executive', 100, 1700);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(110, 'Accounting', 205, 1700);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO DEPARTMENTS VALUES(190, 'Constracting', null, 1700);
+
+1 ligne crÚÚe.
+
+SQL> CREATE TABLE LOCATIONS
+  2  (LOCATION_ID NUMBER(4) CONSTRAINT PK_LOCATIONS PRIMARY KEY,
+  3  STREET_ADDRESS VARCHAR2(40) ,
+  4  POSTAL_CODE VARCHAR2(12),
+  5  CITY VARCHAR2(30) NOT NULL,
+  6  STATE_PROVINCE VARCHAR2(25),
+  7  COUNTRY_ID VARCHAR2(2)) ;
+
+Table crÚÚe.
+
+SQL> INSERT INTO LOCATIONS VALUES (1400, '2014 Jabberwocky Rd','26192','Southlake','Texas','US');
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO LOCATIONS VALUES (1500, '2011 Interiors Blvd','99236','South San Francisco','California','US');
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO LOCATIONS VALUES (1700, '2004 Charade Rd','98199','Seattle','Washington','US');
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO LOCATIONS VALUES (1800, '460 Bloor St.W.','ON M5S 1XB','Toronto','Ontario','CA');
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO LOCATIONS VALUES (2500, 'Magdalen Centre, The Oxford Science Park','0X99ZB','Oxford','Oxford','UK');
+
+1 ligne crÚÚe.
+
+SQL> ALTER TABLE DEPARTMENTS
+  2  ADD CONSTRAINT FK_LOCATION_ID FOREIGN KEY(LOCATION_ID) REFERENCES LOCATIONS(LOCATION_ID);
+
+Table modifiÚe.
+
+SQL> CREATE TABLE EMPLOYEES
+  2  (EMPLOYEE_ID NUMBER(4) CONSTRAINT PK_EMPLOYEE_ID PRIMARY KEY,
+  3  FIRST_NAME VARCHAR2(20),
+  4  LAST_NAME VARCHAR2(25) NOT NULL,
+  5  EMAIL VARCHAR2(25) not null,
+  6  PHONE_NUMBER VARCHAR2(20),
+  7  HIRE_DATE DATE NOT NULL,
+  8  JOB_ID VARCHAR2(10) NOT NULL,
+  9  SALARY NUMBER(8,2),
+ 10  COMMISSION_PCT NUMBER(4,2),
+ 11  MANAGER_ID NUMBER(6) ,
+ 12  DEPARTMENT_ID NUMBER(6) CONSTRAINT FK_DEPARTMENT_ID REFERENCES DEPARTMENTS);
+
+Table crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES
+  2  (100,'Steven','King','SKING','515.123.4567',to_date('17/06/2007','DD/MM/YYYY'),'AD_PRES',24000,NULL,NULL,90);
+
+1 ligne crÚÚe.
+
+SQL> (101,'Neena','Kochhar','NKOCHHAR','515.123.4568',to_date('21/09/2009','DD/MM/YYYY'),'AD_VP',17000,NULL,100,90);
+(101,'Neena','Kochhar','NKOCHHAR','515.123.4568',to_date('21/09/2009','DD/MM/YYYY'),'AD_VP',17000,NULL,100,90)
+ *
+ERREUR Ó la ligne 1 :
+ORA-00928: mot-clÚ SELECT absent
+
+
+SQL> INSERT INTO EMPLOYEES VALUES (101,'Neena','Kochhar','NKOCHHAR','515.123.4568',to_date('21/09/2009','DD/MM/YYYY'),'AD_VP',17000,NULL,100,90);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (102,'Lex','De Hann','LDEHAAN','515.123.4569',to_date('13/01/2009','DD/MM/YYYY'),'AD_VP',17000,NULL,100,90);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (103,'Alexander','Hunold','AHUNOLD','590.423.4567',to_date('03/01/2010','DD/MM/YYYY'),'IT_PROG',9000,NULL,102,60);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (104,'Bruce','Ernst','BERNST','590.423.4568',to_date('21/05/2007','DD/MM/YYYY'),'IT_PROG',6000,NULL,103,60);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (107,'Diana','Lorentz','DLORENTZ','590.423.5567',to_date('07/02/2019','DD/MM/YYYY'),'IT_PROG',4200,NULL,103,60);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (124,'Kevin','Mourgos','KMOURGOS','650.123.5234',to_date('16/11/2019','DD/MM/YYYY'),'ST_MAN',5800,NULL,100,50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (141,'Trenna','Rajs','TRAJS','650.121.8009',to_date('17/10/2015','DD/MM/YYYY'),'ST_CLERK',3500,NULL,124,50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (142,'Curtis','Davies','CDAVIES','650.121.2994',to_date('29/01/2017','DD/MM/YYYY'),'ST_CLERK',3100,NULL,124,50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (143,'Randall','Matos','RMATOS','650.121.2874',to_date('15/03/1998','DD/MM/YYYY'),'ST_CLERK',2600,NULL,124,50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (144,'Peter','Vargas','PVARGAS','650.121.2004',to_date('09/07/2018','DD/MM/YYYY'),'ST_CLERK',2500,NULL,124,50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (149,'Eleni','Zlotkey','EZLOTKEY','011.44.1344.429018',to_date('29/01/2020','DD/MM/YYYY'),'SA_MAN',10500,2,100,80);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (174,'Ellen','Abel','EABEL','011.44.1644.429267',to_date('11/05/2016','DD/MM/YYYY'),'SA_REP',11000,3,149,80);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (176,'Jonathon','Taylor','JTAYLOR','011.44.1644.429265',to_date('29/03/2018','DD/MM/YYYY'),'SA_REP',8600,2,149,80);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (178,'Kimberely','Grant','KGRANT','011.44.1644.429263',to_date('29/05/2019','DD/MM/YYYY'),'SA_REP',7000,15,149,NULL);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (200,'Jennifer','Whalen','JWHALEN','515.123.4444',to_date('17/09/2007','DD/MM/YYYY'),'AD_ASST',4400,NULL,101,10);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (201,'Michael','Hartstein','MHARTSTEIN','515.123.5555',to_date('17/02/2016','DD/MM/YYYY'),'MK_MAN',13000,NULL,100,20);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (202,'Pat','Fay','PFAY','603.123.6666',to_date('17/08/2017','DD/MM/YYYY'),'MK_REP',6000,NULL,201,20);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (205,'Shelley','Higgins','SHIGGINS','515.123.8080',to_date('07/06/2014','DD/MM/YYYY'),'AC_MGR',12000,NULL,101,110);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO EMPLOYEES VALUES (206,'William','Gietz','WGIETZ','515.123.8181',to_date('07/06/2014','DD/MM/YYYY'),'AC_ACCOUNT',8300,NULL,205,110);
+
+1 ligne crÚÚe.
+
+SQL> CREATE TABLE JOB_GRADES
+  2  (GRADE_LEVEL VARCHAR2(3),
+  3  LOWEST_SAL NUMBER,
+  4  HIGHEST_SAL NUMBER ;
+HIGHEST_SAL NUMBER
+                  *
+ERREUR Ó la ligne 4 :
+ORA-00907: parenthÞse de droite absente
+
+
+SQL> CREATE TABLE JOB_GRADES
+  2  (GRADE_LEVEL VARCHAR2(3),
+  3  LOWEST_SAL NUMBER,
+  4  HIGHEST_SAL NUMBER) ;
+
+Table crÚÚe.
+
+SQL> INSERT INTO JOB_GRADES VALUES ('A', 1000, 2999);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_GRADES VALUES ('B', 3000, 5999);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_GRADES VALUES ('c', 6000, 9999);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_GRADES VALUES ('D', 10000, 14999);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_GRADES VALUES ('E', 15000, 24999);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_GRADES VALUES ('F', 25000, 40000);
+
+1 ligne crÚÚe.
+
+SQL> CREATE TABLE JOB_HISTORY
+  2  (EMPLOYEE_ID NUMBER(6) NOT NULL,
+  3  START_DATE DATE NOT NULL ,
+  4  END_DATE DATE NOT NULL,
+  5  JOB_ID VARCHAR2(10) NOT NULL ,
+  6  DEPARTMENT_ID NUMBER(4)) ;
+
+Table crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (102,to_date('13/01/2013','DD/MM/YYYY'),to_date('24/07/2018','DD/MM/YYYY'),'IT_PROG',60);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (101,to_date('21/09/2009','DD/MM/YYYY'),to_date('27/10/2013','DD/MM/YYYY'),'AC_ACCOUNT',110);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (101,to_date('28/10/2013','DD/MM/YYYY'),to_date('27/03/2017','DD/MM/YYYY'),'AC_MGR',110);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (201,to_date('17/02/2016','DD/MM/YYYY'),to_date('19/12/2019','DD/MM/YYYY'),'MK_REP',20);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (114,to_date('24/03/2018','DD/MM/YYYY'),to_date('31/12/2019','DD/MM/YYYY'),'ST_CLERK',50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (122,to_date('01/12/2019','DD/MM/YYYY'),to_date('31/12/2019','DD/MM/YYYY'),'ST_CLERK',50);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (200,to_date('17/09/2007','DD/MM/YYYY'),to_date('17/06/2013','DD/MM/YYYY'),'AD_ASST',90);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (176,to_date('24/03/2018','DD/MM/YYYY'),to_date('31/12/2018','DD/MM/YYYY'),'SA_REP',80);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (176,to_date('01/01/2019','DD/MM/YYYY'),to_date('31/12/2019','DD/MM/YYYY'),'SA_MAN',80);
+
+1 ligne crÚÚe.
+
+SQL> INSERT INTO JOB_HISTORY VALUES (200,to_date('01/07/2014','DD/MM/YYYY'),to_date('31/12/2018','DD/MM/YYYY'),'AC_ACCOUNT',90);
+
+1 ligne crÚÚe.
+
+SQL> COMMIT;
+
+Validation effectuÚe.
+
+SQL>
+
+
+
+
+
+
+
+
+
+
+
+Microsoft Windows [version 10.0.19045.3693]
+(c) Microsoft Corporation. Tous droits réservés.
+
+C:\WINDOWS\system32>lsnrctl status
+
+LSNRCTL for 64-bit Windows: Version 21.0.0.0.0 - Production on 09-D╔C. -2023 17:18:31
+
+Copyright (c) 1991, 2021, Oracle.  All rights reserved.
+
+Connexion Ó (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.56.1)(PORT=1521)))
+STATUT du PROCESSUS D'ECOUTE
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for 64-bit Windows: Version 21.0.0.0.0 - Production
+Date de dÚpart                       09-D╔C. -2023 16:25:38
+DurÚe d'activitÚ                    0 jours 0 heures 52 min. 53 sec
+Niveau de trace           off
+SÚcuritÚ                  ON: Local OS Authentication
+SNMP                      OFF
+Service par dÚfaut           XE
+Fichier de paramÞtres du processus d'Úcoute     C:\app\mohom\product\21c\homes\OraDB21Home1\network\admin\listener.ora
+Fichier journal du processus d'Úcoute             C:\app\mohom\product\21c\diag\tnslsnr\DESKTOP-FPLPE8K\listener\alert\log.xml
+RÚcapitulatif d'Úcoute des points d'extrÚmitÚ...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.56.1)(PORT=1521)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(PIPENAME=\\.\pipe\EXTPROC1521ipc)))
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=127.0.0.1)(PORT=5500))(Security=(my_wallet_directory=C:\APP\MOHOM\PRODUCT\21C\admin\XE\xdb_wallet))(Presentation=HTTP)(Session=RAW))
+RÚcapitulatif services...
+Le service "1c00d8884fd24c57988990566881456a" comporte 1 instance(s).
+  L'instance "xe", statut READY, comporte 2 gestionnaire(s) pour ce service...
+Le service "CLRExtProc" comporte 1 instance(s).
+  L'instance "CLRExtProc", statut UNKNOWN, comporte 1 gestionnaire(s) pour ce service...
+Le service "XE" comporte 1 instance(s).
+  L'instance "xe", statut READY, comporte 2 gestionnaire(s) pour ce service...
+Le service "XEXDB" comporte 1 instance(s).
+  L'instance "xe", statut READY, comporte 1 gestionnaire(s) pour ce service...
+Le service "xepdb1" comporte 1 instance(s).
+  L'instance "xe", statut READY, comporte 2 gestionnaire(s) pour ce service...
+La commande a rÚussi
+
+C:\WINDOWS\system32>
+
+
+________________________________________________________________________________________________________
+GRANT CREATE SESSION TO GL_EXAM;
+GRANT CREATE TABLE TO GL_EXAM;
+GRANT CREATE SEQUENCE TO GL_EXAM;
+GRANT CREATE PROCEDURE TO GL_EXAM;
+
+
+
+CREATE TABLE DEPT (Dept_id NUMBER(4) PRIMARY KEY,dept_name VARCHAR2(20) NOT NULL,mgr_id NUMBER(6));
+
+CREATE TABLE EMP (emp_id NUMBER(6) PRIMARY KEY,emp_name VARCHAR2(20) NOT NULL,hire_date DATE NOT NULL,Job_id VARCHAR2(10),salary NUMBER(7,2) DEFAULT 2000,mgr_id NUMBER(6),dept_id NUMBER(4),CONSTRAINT fk_deptid FOREIGN KEY (dept_id) REFERENCES DEPT(Dept_id));
+
+INSERT INTO employees (employee_id, first_name, hire_date, job_id, salary, manager_id, department_id)
+VALUES (100, 'King', TO_DATE('17/06/2007', 'DD/MM/YYYY'), 'AD_PRES', 24000, NULL, NULL);
+
+
+UPDATE emp
+SET deptno = 90
+WHERE empno IN (100, 101);
+
+DELETE FROM dept
+WHERE dept_id = 50;
+
+
+
+ALTER TABLE emp ADD CONSTRAINT fk_dept_id FOREIGN KEY (dept_id) REFERENCES dept(dept_id) ON DELETE SET NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+Pour afficher le nom, le salaire et l'année d'embauche des employés qui travaillent dans le même département que celui de leur manager, vous pouvez utiliser la requête suivante en Oracle :
+
+```sql
+SELECT 
+    e.EMP_NAME AS "Nom de l'Employé",
+    e.SALARY AS "Salaire",
+    TO_CHAR(e.HIRE_DATE, 'YYYY') AS "Année d'Embauche"
+FROM 
+    EMP e
+JOIN EMP m ON e.DEPT_ID = m.DEPT_ID AND e.MGR_ID = m.EMP_ID;
+```
+
+Explications de la requête :
+- Nous sélectionnons le nom de l'employé (EMP_NAME), le salaire (SALARY) et l'année d'embauche (HIRE_DATE) de la table EMP.
+- Nous joignons la table EMP à elle-même en utilisant une jointure JOIN.
+- Nous comparons le département de l'employé (e.DEPT_ID) avec le département du manager (m.DEPT_ID) et le manager de l'employé (e.MGR_ID) avec l'ID de l'employé manager (m.EMP_ID).
+- Ainsi, la requête affichera les employés qui travaillent dans le même département que leur manager, avec leur nom, salaire et année d'embauche.
+
+Cette requête affichera le nom, le salaire et l'année d'embauche des employés qui travaillent dans le même département que celui de leur manager.
