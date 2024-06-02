@@ -1,0 +1,34 @@
+on modifie d'abord la route middleware de la sorte 
+Route::middleware('auth:sanctum')->group(function (){
+
+    //retourner l'utisateur actuellement connecté
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});
+
+on ajoute la route store au niveau du middleware
+Route::middleware('auth:sanctum')->group(function (){
+    //ajouter un post
+    Route::post('posts/create',[PostController::class, 'store']);
+
+    //retourner l'utisateur actuellement connecté
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});
+
+et au niveau de Postontroller avant le save mettre
+$post -> user_id = auth()->user()->id;
+
+dans postman on verifie si le post est assigne a  un user
+http://127.0.0.1:8000/api/posts/create(post)
+{
+    "titre" : "titre 1",
+    "description" : "description 1"
+}
+
+on verra que c'est fait 
+
+si on enleve le token on pourra pas se connecter !!!
+

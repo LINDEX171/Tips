@@ -1,0 +1,4 @@
+si on mets cascade c'est a dire on peut supprimer la colone et que 
+ca supprime les articles qui exister
+si on mets constraint il sera impossible de supprimer une categorie
+relier a des articles

@@ -544,6 +544,65 @@ on verra que c'est fait
 
 si on enleve le token on pourra pas se connecter !!!
 
+______________securiser le update ______________
+dans api.php on deplace d'abord la route update au niveau du middleware
+
+maintenant au niveau du controller avant de faire la modification
+on verifie si l'utilisateur qui veut modifier coreespond a son post
+et est connecté
+
+public function update(CreatePostRequest $request, Post $post){
+        
+         try {
+            $post -> titre = $request -> titre;
+         $post -> description = $request -> description;
+         
+         if ($post -> user_id === auth()->user()->id) {
+            $post -> save();
+
+         } else {
+
+            return response()->json([
+            'status_code'=>422,
+            'statu_message'=>'vous n\etes pas l\'auteur de ce post',
+            ]);
+         }
+
+
+apres on part denas postman
+http://127.0.0.1:8000/api/posts/edit/3 (put)
+vous n'etes pas l'auteur de ce post
+http://127.0.0.1:8000/api/posts/edit/5
+POST modifier avec succes
+
+
+______________securiser suppression _____________
+dans api.php on deplace d'abord la route delete au niveau du middleware
+
+au niveau du controller 
+
+public function delete(Post $post){
+        
+        try {
+
+            if ($post -> user_id === auth()->user()->id) {
+                $post -> delete();
+    
+             } else {
+    
+                return response()->json([
+                'status_code'=>422,
+                'statu_message'=>'vous n\etes pas l\'auteur de ce post',
+                ]);
+             }
+
+
+dans postman http://127.0.0.1:8000/api/posts/2(delete)
+"statu_message": "vous n\\etes pas l'auteur de ce post"
+
+http://127.0.0.1:8000/api/posts/8
+le post a été supprimer
+
 
 
 

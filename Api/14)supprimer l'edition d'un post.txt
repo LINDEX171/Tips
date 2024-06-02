@@ -1,0 +1,26 @@
+______________securiser suppression _____________
+dans api.php on deplace d'abord la route delete au niveau du middleware
+
+au niveau du controller 
+
+public function delete(Post $post){
+        
+        try {
+
+            if ($post -> user_id === auth()->user()->id) {
+                $post -> delete();
+    
+             } else {
+    
+                return response()->json([
+                'status_code'=>422,
+                'statu_message'=>'vous n\etes pas l\'auteur de ce post',
+                ]);
+             }
+
+
+dans postman http://127.0.0.1:8000/api/posts/2(delete)
+"statu_message": "vous n\\etes pas l'auteur de ce post"
+
+http://127.0.0.1:8000/api/posts/8
+le post a été supprimer
