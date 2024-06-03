@@ -1,0 +1,22 @@
+premierement au niveau du controller mettre
+$articles = Article::paginate(5);
+
+et apres  au niveau du view mettre 
+</table>
+         </div>
+               <!-- Pagination -->
+                    
+        <div style="display: flex; justify-content: flex-end;">
+                        {{ $article->links() }}
+             </div>
+                    <!-- End Pagination -->
+           </div>
+
+et puis dans app/provider/appserviceprovider mettre
+
+public function boot(): void
+    {
+        Paginator::useBootstrap();
+    }
+
+en ajoutant use Illuminate\Pagination\Paginator; en haut
