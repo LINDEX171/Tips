@@ -1,0 +1,3 @@
+npm install -g @angular/cli (pour installer le commande line interface)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+ng new FirstApp (creation projet)

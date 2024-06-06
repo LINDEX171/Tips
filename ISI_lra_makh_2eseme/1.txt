@@ -1,0 +1,2 @@
+creer migration
+php artisan make:model Article -m
