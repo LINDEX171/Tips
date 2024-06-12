@@ -1,0 +1,33 @@
+on pars dans xampp on crée la bdd jee_db
+on crée une table produit_tb(id,designation(50,Unique),prix(double)
+quantite(int(11), valeur par defaut(1))
+on fait 3 insertions au niveau de la table
+
+On crée un projet java-jee(web application)
+au niveau des configurations(la ou on a mis contact cliquer la bas)
+pour changer l'url a l'execution de l'app on vient dans deployment
+en bas on met l'url qu'on veut 
+on supprime le HelloServlet
+
+et puis dans sn.dev.jeeapp2024 creer un package nommer dao web et entity
+dans dao creer une interface nommer IProduitDao et une classe SingletonConnection,ProduitImplDao
+TestDao et on implemente la methode main dans DAO
+dans web creer 2classes ProduitModel et ProduitServlet
+
+dans webapp(supprimer le fichier index.jsp) et on cree un fichier 
+add,edit,list.
+
+dans le package entity on ajoute la classe produit
+
+<dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.32</version>
+</dependency>
+
+   <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+    </dependency>

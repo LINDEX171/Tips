@@ -1,3 +1,37 @@
 npm install -g @angular/cli (pour installer le commande line interface)
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-ng new FirstApp (creation projet)
+ng new catalog (creation projet)
+ng serve por demarrer l'applcation
+on installe bootstrap avec la cmd npm install --save bootstrap
+et pour les icons aussi npm install --save bootstrap-icons
+
+dans src/app/app.compnent.html tous enlever
+on crée les components
+ng g c products
+ng g c customers
+
+apres avoir creer les components on vient dans app.component.html
+on importe le navbar de bootstrap
+pour integrer bootstrap y'a 2 Manieres de le faire: 
+
+---first---
+on pars dans le fichier app/style.css on ajoute
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+----seconde ----
+on pars dans le fichier app/angular.json on cherche styles
+on ajoute
+"styles": [
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+           ],
+
+et pres faut redemarrer le srveur quand on modifie le fichier json
+
+mais le dropdown ne vient c'est parceque c'est du js pour l'integrer
+on pars dans le fichier app/angular.json on cherche scripts
+
+"scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
+            ]
+et on redemarre le server
