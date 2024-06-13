@@ -31,3 +31,380 @@ dans le package entity on ajoute la classe produit
             <version>1.18.32</version>
             <scope>provided</scope>
     </dependency>
+
+dans la classe Produit qui se trouve au niveau du dossier entity
+mettre les attributs
+
+@AllArgsConstructor
+@ToString
+@Setter
+@Getter
+@NoArgsConstructor
+public class Produit {
+    private int id;
+    private String designation;
+    private double prix;
+    private int quantite;
+}
+
+_____________ connexion ___________
+
+et puis dans SingletoConnection mettre ca (pour la connection)
+
+package sn.dev.jeeapp2024.dao;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+public class SingletonConnection {
+        private Connection cnx;
+        private PreparedStatement pstm;
+        private ResultSet rs;
+        private int ok;
+
+        private void getConnection(){
+            String url = "jdbc:mysql://localhost:3306/jee_db";
+            String user = "root";
+            String password = "";
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                cnx = DriverManager.getConnection(url, user, password);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        public void initPrepar(String sql){
+            try {
+                getConnection();
+                pstm = cnx.prepareStatement(sql);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        public ResultSet executeSelect(){
+            rs = null;
+            try {
+                rs = pstm.executeQuery();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return rs;
+        }
+
+        public int executeMaj(){
+            try {
+                ok = pstm.executeUpdate();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return ok;
+        }
+
+        public void closeConnection(){
+            try{
+                if(cnx != null)
+                    cnx.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        public PreparedStatement getPstm(){
+            return pstm;
+        }
+    
+}
+
+
+______interface (on definira toute nos methodes dans l'interface)_______
+
+public interface IProduitDao {
+    public Produit save(Produit produit); //enregistrer les produits
+
+    public List<Produit> getProduitsByMC(String mc);//lister produit
+
+    public  Produit getProduitById(int id);//recuerer id produit pour la modification
+
+    public  int update(Produit produit);//update produit
+
+    public int delete(int id);//delete produit
+}
+
+
+maintenant on va implementer cette interface on pars dans
+ProduitImpDao
+je mets public class IProduitDao et j'implemente les methodes
+
+apres avoir implementer les methodes on mets
+private SingletonConnection db = new SingletonConnection();
+private ResultSet rs;
+private int ok;
+
+
+et dans la methode save mettre
+public Produit save(Produit produit) {
+        String sql = "INSERT INTO produit_tb VALUES(null,?,?,?)";
+        try {
+            db.initPrepar(sql);
+            db.getPstm().setString(1, produit.getDesignation());
+            db.getPstm().setDouble(2, produit.getPrix());
+            db.getPstm().setInt(3, produit.getQuantite());
+            ok = db.executeMaj();
+            db.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produit;
+
+}
+
+et puis dans la classe TestDao mettre 
+
+public class TestDao {
+    public static void main(String[] args) {
+        IProduitDao metier = new ProduitImplDao();
+        Produit produit = new Produit();
+        produit.setDesignation("Café");
+        produit.setPrix(100.0);
+        produit.setQuantite(2);
+        Produit p = metier.save(produit);
+        System.out.println(p);
+    }
+}
+
+
+---- pour l'enregistrement(ProduitImplDao)---
+
+public Produit save(Produit produit) {
+        String sql = "INSERT INTO produit_tb VALUES(null,?,?,?)";
+        try {
+            db.initPrepar(sql);
+            db.getPstm().setString(1, produit.getDesignation());
+            db.getPstm().setDouble(2, produit.getPrix());
+            db.getPstm().setInt(3, produit.getQuantite());
+            ok = db.executeMaj();
+            if (ok == 1){
+                String req = "SELECT MAX(id) as max_id FROM produit_tb";
+                db.initPrepar(req);
+                rs = db.executeSelect();
+                if (rs.next()){
+                    produit.setId(rs.getInt("max_id"));
+                }
+            }
+            db.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produit;
+
+    }
+
+----list
+
+public List<Produit> getProduitsByMC(String mc) {
+        List<Produit> produits = new ArrayList<>();
+        String sql = "SELECT * FROM produit_tb WHERE designation LIKE ? ORDER BY designation ASC";
+        try {
+            db.initPrepar(sql);
+            db.getPstm().setString(1, mc);
+            rs = db.executeSelect();
+            while (rs.next()){
+                Produit p = new Produit(
+                        rs.getInt("id"),
+                        rs.getString("designation"),
+                        rs.getDouble("prix"),
+                        rs.getInt("quantite")
+                );
+                produits.add(p);
+            }
+            db.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produits;
+    }
+
+
+dans TestDao on enleve le test pour le save et on fait le test
+pour list
+
+public class TestDao {
+    public static void main(String[] args) {
+        IProduitDao metier = new ProduitImplDao();
+        String motCle = "%%";
+        for (Produit p : metier.getProduitsByMC(motCle)){
+            System.out.println(p);
+        }
+
+    }
+}
+
+et on verra que si on recherche un produit directement ca vient
+
+
+____getproduitbyid (ProduitImplDao) ___
+
+@Override
+    public Produit getProduitById(int id) {
+        Produit produit = null;
+        String sql = "SELECT * FROM produit_tb WHERE id = ?";
+        try {
+            db.initPrepar(sql);
+            db.getPstm().setInt(1, id);
+            rs = db.executeSelect();
+           if (rs.next()){
+                produit  = new Produit(
+                        rs.getInt("id"),
+                        rs.getString("designation"),
+                        rs.getDouble("prix"),
+                        rs.getInt("quantite")
+                );
+            }
+            db.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produit;
+    }
+
+
+_________update ____
+@Override
+    public int update(Produit produit) {
+        String sql = "UPDATE produit_tb SET designation = ?, prix = ?, quantite = ? WHERE id = ?";
+        try {
+            db.initPrepar(sql);
+            db.getPstm().setString(1, produit.getDesignation());
+            db.getPstm().setDouble(2, produit.getPrix());
+            db.getPstm().setInt(3, produit.getQuantite());
+            db.getPstm().setInt(4, produit.getId());
+            ok = db.executeMaj();
+            db.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ok;
+    }
+
+________  delete  _______
+@Override
+    public int delete(int id) {
+        String sql = "DELETE FROM produit_tb  WHERE id = ?";
+        try {
+            db.initPrepar(sql);
+            db.getPstm().setInt(1, id);
+            ok = db.executeMaj();
+            db.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ok;
+    }
+
+puis dans TestDao enlevons le test de list et essayons pour la
+recuperation et l'update
+
+
+public class TestDao {
+    public static void main(String[] args) {
+        IProduitDao metier = new ProduitImplDao();
+        Produit p = metier.getProduitById(1);
+        p.setDesignation("pose-souris");
+        p.setPrix(2500);
+        p.setQuantite(300);
+        int ok = metier.update(p);
+        }
+}
+
+et puis quand on run et on actualise la dd on verra que c'est mdifié
+
+puis dans TestDao enlevons le test de l'update et essayons pour la
+suppression 
+
+public class TestDao {
+    public static void main(String[] args) {
+        IProduitDao metier = new ProduitImplDao();
+        int ok = metier.delete(2);
+        }
+}
+
+si on le run t vient au niveau de notre bdd on verra que l'id 8 a été supprmer
+
+            CODE METIER DONE !!!!!!!!!!!!!!!
+
+
+__________partie web______
+dans webapp creer un dossier nommer css
+et puis dans css coller les 2 bootstrap.min.css et style.css
+
+dans le fichier list.jsp mettre
+
+
+<html>
+<head>
+    <title>Product app | liste</title>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container col-md-10 col-md-offset1">
+<div class="card">
+    <div class="card-header"> Liste des produits</div>
+    <div class="card-body">
+        <form action="search.php" method="get">
+            <div class="form-group">
+                <label>Mot cle</label>
+                <input type="text" name="motcle" placeholder="votre mot cle">
+                <button type="submit" class="btb btn-success">Rechercher</button>
+            </div>
+        </form>
+         <table>
+             <tr>
+                 <th>ID</th>
+                 <th>Designation</th>
+                 <th>Prix</th>
+                 <th>Quantite</th>
+                 <th>Montant</th>
+                 <th colspan="2">Actions</th>
+             </tr>
+             <tr></tr>
+         </table>
+
+    </div>
+    
+</div>
+</div>
+
+
+
+</body>
+</html>
+
+
+dans webapp/ProduitModel on implemente les attributs,const,get,set
+
+@Data
+public class ProduitModel {
+    private String motCle;
+    private List<Produit> produits = new ArrayList<>();
+}
+
+la premiere chose a faire chaque servlet doit heriter de la classe 
+http servlet pour avoir acces au methode doget, dopost ect ..
+
+et puis on vient dans webapp/ProduitServlet  on extends HttpServlet
+pour acceder au methode doget et autres ..
+
+on ajoute init, doGet et doPost (on enleve les contenues qui sont
+a l'interieur des accolades et mettre la ou n'a mis req request
+et response la ou n'a mis res
+
+ajouter aussi 
+@WebServlet(name = "ps", urlPatterns = "*.php")
+public class ProduitServlet extends HttpServlet {
+
+et c'est le servet qui nous permettra de se rediriger 
+sur les autres pages
+ 
