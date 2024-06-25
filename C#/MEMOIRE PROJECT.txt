@@ -1,0 +1,175 @@
+https://medium.com/@jelleschrader/using-entity-framework-6-mysql-4778b99e980d
+
+
+on cree un projet bureau (Application windows forms(.NET Framework))
+nom du projet : AppSharedmemory
+nom de la solution: Groupe2SharedMemory
+
+apres avoir creer le projet on va le lier avec un prjet wcf(de type soap)
+solution/ajouter/nuveau projet (type web , wcf(application de service))
+nom du projet : MetierSharedMemory
+a l'interieur de notre 	api MetierSharedMemory on mets clique droit
+ajouter/nouveau dossier/ on le nomme Model 
+on cree aussi contrler ajouter/nouveau dossier/ on le nomme Model
+
+maintenant on dot liés les 2 l'api et le projet(MetierSharedMemory et AppSharedmemory)
+on pars dans reference clique droit ajouter une reference de service ON CLIQUE sur
+decouvrir on selectionne Service1.svc (une erreur c'est produite)
+c'est normal on doit faire un build du projet (solution/regenerer)
+et on reprends et on verra que c'est bon 
+
+espace de noms: ServiceMetier
+
+apres on pars dans form1.cs on clique la-bas 
+
+public Form1()
+{
+    InitializeComponent();
+    service = new ServiceMetier.Service1Client();
+}
+
+
+ServiceMetier.Service1Client service;
+private void Form1_Load(object sender, EventArgs e)
+{
+
+}
+
+
+on defini MetierSharedMemory comme projet de demarrage en allant dans
+MetierSharedMemory clique droit (charger en tant que projet de demarrage)
+
+et puis dans le fichier web.config
+on mets  <connectionStrings>
+<add name="connGp2Sharedmemory"
+	 providerName="MySql.Data.MySqlClient"
+	 connectionString="server=localhost;userid=root;port=3307;password=passer;database=bdGp2Sharedmemory;persistsecurityinfo=True" />
+</connectionStrings>	
+
+dans la balise <configuration> 
+
+
+______ creation du contexte ________
+on crée dans model une classe nommer BdGp2SharedMemoryContext
+on importe d'abord using System.Data.Entity; 
+namespace MetierSharedMemory.Model
+{
+    [DbConfigurationType(typeof(MySqlEFConfiguration))]
+    public class BdGp2SharedMemoryContext:DbContext
+    {
+        public BdGp2SharedMemoryContext() : base("connGp2Sharedmemory") {}
+        public DbSet<Personne> personnes { get; set; } 
+    }
+}
+
+et apres on fat un build du projet(regenerer)
+
+apres outil/getionnaire de package nugets/console
+(Enable-Migrations -ContextTypeName BdGp2SharedMemoryContext)
+nb: on doit se pointer sur metier
+
+et apres on verra que dans model y'a eu configuration on entre dans 
+configuraton et on mets
+public Configuration()
+{
+    AutomaticMigrationsEnabled = true;
+    AutomaticMigrationDataLossAllowed = false;
+}
+	
+et apres on met Update-Database -Verbose
+et maintenant n verra que si on pars au niveau de mysql workbench
+on verra la bdd
+
+________Personne
+dans model creeons une classe nomer Personne 
+dans Personne importer 
+using System.ComponentModel.DataAnnotations; //pour les contraintes
+using System.ComponentModel.DataAnnotations.Schema; //pour les contraintes 
+
+
+public class Personne
+{
+    [Key]
+    public int IdPersonne { get; set; }
+    [Display(Name ="Nom")]
+    [MaxLength(80, ErrorMessage ="la taille maximale est de 80"), Required(ErrorMessage ="*")]
+    public string Nom { get; set; }
+    [Display(Name = "Prénom")]
+    [MaxLength(80, ErrorMessage = "la taille maximale est de 80"), Required(ErrorMessage = "*")]
+    public string Prenom { get; set; }
+}
+
+et maintenant je dois le declarer dans mon ontexte pour que ca soit visible 
+dans mon context ajouter public DbSet<Personne> personnes { get; set; } 
+genre
+ public class BdGp2SharedMemoryContext:DbContext
+{
+    public BdGp2SharedMemoryContext() : base("connGp2Sharedmemory") {}
+    public DbSet<Personne> personnes { get; set; } 
+}
+
+et puis  Update-Database -Verbose
+
+et la on verra que la table personne a été créé
+
+____encadreur
+dans model creeons une classe nomer Encadreur 
+dans Encadreur importer 
+using System.ComponentModel.DataAnnotations; //pour les contraintes
+using System.ComponentModel.DataAnnotations.Schema; //pour les contraintes 
+
+(encadreur herite de personne)
+
+namespace MetierSharedMemory.Model
+{
+    public class Encadreur:Personne
+    {
+        [Display(Name = "Spécialité de l'encadreur")]
+        [MaxLength(80, ErrorMessage = "la taille maximale est de 80"), Required(ErrorMessage = "*")]
+        public string Specialite { get; set; }
+    }
+
+
+et maintenant je dois le declarer dans mon ontexte pour que ca soit visible 
+dans mon context ajouter public DbSet<Encadreur> encadreurs { get; set; } 
+genre
+ public class BdGp2SharedMemoryContext:DbContext
+{
+    public BdGp2SharedMemoryContext() : base("connGp2Sharedmemory") {}
+   
+    }
+
+apres on regenere puis Update-Database -Verbose
+
+___memoire
+dans model creeons une classe nomer Memoire
+dans Memoire importer 
+using System.ComponentModel.DataAnnotations; //pour les contraintes
+using System.ComponentModel.DataAnnotations.Schema; //pour les contraintes 
+
+
+ public class Memoire
+ {
+     public int IdMemoire { get; set; }
+     public string Sujet { get; set; }
+
+     public string SujetName { get; set; }
+
+     public int Annee { get; set; } 
+
+     public int? IdEncadreur { get; set; }
+     [ForeignKey("IdEncadreur")]
+     public Encadreur Encadreur { get; set; }
+ }
+
+et maintenant je dois le declarer dans mon ontexte pour que ca soit visible 
+dans mon context ajouter public DbSet<Memoire> memoires { get; set; } 
+genre
+ public class BdGp2SharedMemoryContext:DbContext
+{
+    public BdGp2SharedMemoryContext() : base("connGp2Sharedmemory") {}
+    public DbSet<Memoire> memoires { get; set; }
+   
+    }
+
+apres on regenere puis Update-Database -Verbose

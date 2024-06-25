@@ -1,0 +1,41 @@
+hosts(windows/systeme32/drivers/etc/hosts)
+127.0.0.1       schooltriptrack.local
+
+
+xampp/apache/conf/extra/httpd-vhost.conf
+<VirtualHost *:80>
+    ServerName insoft.local
+
+    ProxyRequests On
+    <Proxy>
+        Order deny,allow
+        Allow from all
+    </Proxy>
+    
+    ProxyPass / http://127.0.0.1:8003/
+    ProxyPassReverse / http://127.0.0.1:8003/
+    Header set Access-Control-Allow-Origin "*"
+    <Location />
+        Order allow,deny
+        Allow from all
+    </Location>
+</VirtualHost>
+
+
+<VirtualHost *:80>
+    ServerName schooltriptrack.local
+
+    ProxyRequests On
+    <Proxy>
+        Order deny,allow
+        Allow from all
+    </Proxy>
+    
+    ProxyPass / http://127.0.0.1:8003/
+    ProxyPassReverse / http://127.0.0.1:8003/
+    Header set Access-Control-Allow-Origin "*"
+    <Location />
+        Order allow,deny
+        Allow from all
+    </Location>
+</VirtualHost>

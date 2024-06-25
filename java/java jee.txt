@@ -407,4 +407,6 @@ public class ProduitServlet extends HttpServlet {
 
 et c'est le servet qui nous permettra de se rediriger 
 sur les autres pages
- 
+
+
+
